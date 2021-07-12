@@ -256,29 +256,69 @@ class Reading {
 }
 ```
 
-## 6.10
+## 6.10 여러 함수를 변환 함수로 묶기
+
+변환 함수는 원본 데이터를 입력받아서 필요한 정보를 모두 도출한 뒤, 각각을 출력 데이터의 필드에 넣어 반환한다.  
+
+이 리팩터링 대신 여러 함수를 클래스로 묶기로 처리해도 된다. 원본 데이터가 코드 안에서 갱신될 때는 클래스로 묶는게 좋다.
 
 ### 절차
 
+1. 변환할 레코드를 입력받아서 값을 그대로 반환하는 변환 함수를 만든다.
+2. 묶을 함수 중 하나를 골라서 본문의 코드를 변환 함수로 옮기고, 처리 결과를 레코드에 새 필드로 기록한다. 그런 다음 클라이언트 코드가 이 필드를 사용하도록 수정한다.
+3. 테스트한다.
+4. 나머지 함수도 위 과정에 따라 처리한다.
+
 ### Before
 ```js
-
+function base(aReading) {...}
+function taxableCharge(aReading) {...}
 ```
 
 ### After
 ```js
-
+function enrichReading(argReading) {
+    const aReading = _.cloneDeep(argReading);
+    aReading.baseCharge = base(aReading);
+    aReading.taxableCharge = taxableCharge(aReading);
+    return aReading;
+}
 ```
 
-## 6.11
+## 6.11 단계 쪼개기
+
+서로 다른 두 대상을 한꺼번에 다루는 코드를 발견하면 각각을 별개 모듈로 나누자. 모듈을 분리하는 가장 간편한 방법은 동작을 연이은 두 단계로 쪼개는 것이다.  
+
 ### 절차
+
+1. 두 번째 단계에 해당하는 코드를 독립 함수로 추출한다.
+2. 테스트한다.
+3. 중간 데이터 구조를 만들어서 앞에서 추출한 함수의 인수로 추가한다.
+4. 테스트한다.
+5. 추출한 두 번째 단계 함수의 매개변수를 하나씩 검토한다. 그중 첫 번째 단계에서 사용되는 것은 중간 데이터 구조로 옮긴다.
+6. 첫 번째 단계 코드를 함수로 추출하면서 중간 데이터 구조를 반환하도록 만든다.
 
 ### Before
 ```js
-
+const orderData = orderString.split(/\s+/);
+const productPrice = priceList[orderData[0].split("-")[1]];
+const orderPrice = parseInt(orderData[1]) * productPrice;
 ```
 
 ### After
 ```js
+const orderRecord = parseOrder(order);
+const orderPrice = price(orderRecord, priceList);
 
+function parseOrder(aString) {
+    const values = aString.split(/\s+/);
+    return ({
+        productID: values[0].split("-")[1],
+        quantity: parseInt(values[1]),
+    });
+}
+
+function price(order, priceList) {
+    return order.quantity * priceList[order.productID];
+}
 ```
