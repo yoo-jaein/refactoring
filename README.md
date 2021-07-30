@@ -19,7 +19,7 @@
 - [X] CHAPTER 06 기본적인 리팩터링
 - [X] CHAPTER 07 캡슐화
 - [X] CHAPTER 08 기능 이동
-- [ ] CHAPTER 09 데이터 조직화
+- [X] CHAPTER 09 데이터 조직화
 - [ ] CHAPTER 10 조건부 로직 간소화
 - [ ] CHAPTER 11 API 리팩터링
 - [ ] CHAPTER 12 상속 다루기
