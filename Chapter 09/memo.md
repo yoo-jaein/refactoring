@@ -44,13 +44,29 @@ console.log(area);
 ### Before
 ```js
 class Organization {
-    get name() {...}
+    constructor(data) {
+        this._name = data.name;
+        this._country = data.country;
+    }
+    get name() {return this._name;}
+    set name(aString) {this._name = aString;}
+    get country() {return this._country;}
+    set country(aCountryCode) {this._country = aCountryCode;}
+} 
 ```
 
 ### After
 ```js
 class Organization {
-    get title() {...}
+    constructor(data) {
+        this._title = data.title;
+        this._country = data.country;
+    }
+    get title() {return this._title;}
+    set title(aString) {this._title = aString;}
+    get country() {return this._country;}
+    set country(aCountryCode) {this._country = aCountryCode;}
+}
 ```
 
 ## 9.3 파생 변수를 질의 함수로 바꾸기
@@ -83,6 +99,8 @@ set discount(aNumber) {this._discount = aNumber;}
 
 ## 9.4 참조를 값으로 바꾸기
 
+객체를 다른 객체에 중첩하면 '내부 객체를 참조' 혹은 '값으로 취급'할 수 있다. 참조로 다루는 경우에는 내부 객체는 그대로 둔 채 그 객체의 속성만 갱신하며, 값으로 다루는 경우에는 새로운 속성을 담은 객체로 기존 내부 객체를 통째로 대체한다. 값으로 취급하면 불변 데이터로 다루기 때문에 자유롭게 활용하기에 좋다.  
+
 ### 절차
 1. 후보 클래스가 불변인지, 혹은 불변이 될 수 있는지 확인한다.
 2. 각각의 세터를 하나씩 제거한다.
@@ -103,6 +121,8 @@ class Product {
 ```
 
 ## 9.5 값을 참조로 바꾸기
+
+논리적으로 같은 데이터를 복제해서 사용할 때 가장 크게 문제되는 상황은 그 데이터를 업데이트해야 할 때다. 모든 복제본을 찾아서 빠짐없이 갱신해야 하며, 하나라도 놓치면 데이터 일관성이 깨져버린다. 이런 상황이라면 값 데이터를 모두 참조로 바꿔주는 게 좋다. 값을 참조로 바꾸면 엔티티 하나당 객체도 단 하나만 존재하게 된다. 이 때 이런 객체들을 모아놓고 클라이언트의 접근을 관리해주는 저장소 객체(repository)를 사용하게 된다.   
 
 ### 절차
 1. 같은 부류에 속하는 객체들을 보관할 저장소를 만든다.
