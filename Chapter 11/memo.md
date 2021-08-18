@@ -140,106 +140,200 @@ function availableVacation(anEmployee) {
     ...
 ```
 
-## 11.
+## 11.6 질의 함수를 매개변수로 바꾸기
 
 ### 절차
-1.
+1. 변수 추출하기로 질의 코드를 함수 본문의 나머지 코드와 분리한다.
+2. 함수 본문 중 해당 질의를 호출하지 않는 코드들을 별도 함수로 추출한다.
+3. 방금 만든 변수를 인라인하여 제거한다.
+4. 원래 함수도 인라인한다.
+5. 새 함수의 이름을 원래 함수의 이름으로 고쳐준다.
 
 ### Before
 ```js
+targetTemperature(aPlan)
+
+function targetTemperature(aPlan) {
+    currentTemperature = thermostat.currentTemperature;
 ```
 
 ### After
 ```js
+targetTemperature(aPlan, thermostat.currentTemperature)
+
+function targetTemperature(aPlan, currentTemperature) {
 ```
 
-## 11.
+## 11.7 세터 제거하기
+
+세터 메서드가 있다는 것은 필드가 수정될 수 있다는 뜻이다. 세터 제거하기가 필요한 상황은 주로 두 가지다. 첫째, 무조건 접근자 메서드를 통해서만 필드를 다루고 싶을 때. 두 번째, 클라이언트에서 생성 스크립트(일련의 세터 모음)를 사용해 객체를 생성할 때.
 
 ### 절차
-1.
+1. 설정해야 할 값을 생성자에서 받지 않는다면 그 값을 받을 매개변수를 생성자에 추가한다(함수 선언 바꾸기). 그런 다음 생성자 안에서 적절한 세터를 호출한다.
+2. 생성자 밖에서 세터를 호출하는 곳을 찾아 제거하고, 대신 새로운 생성자를 사용하도록 한다. 하나 수정할 때마다 테스트한다.
+3. 세터 메서드를 인라인한다. 가능하다면 해당 필드를 불변으로 만든다.
+4. 테스트한다.
 
 ### Before
 ```js
+class Person {
+    get name() {...}
+    set name(aString) {...}
 ```
 
 ### After
 ```js
+get name() {...}
 ```
 
-## 11.
+## 11.8 생성자를 팩터리 함수로 바꾸기
 
 ### 절차
-1.
+1. 팩터리 함수를 만든다. 팩터리 함수의 본문에서는 원래의 생성자를 호출한다.
+2. 생성자를 호출하던 코드를 팩터리 함수 호출로 바꾼다.
+3. 하나씩 수정할 때마다 테스트한다.
+4. 생성자의 가시 범위가 최소가 되도록 제한한다.
 
 ### Before
 ```js
+leadEngineer = new Employee(document.leadEngineer, 'E');
 ```
 
 ### After
 ```js
+leadEngineer = createEngineer(document.leadEngineer);
 ```
 
-## 11.
+## 11.9 함수를 명령으로 바꾸기
 
 ### 절차
-1.
+1. 대상 함수의 기능을 옮길 빈 클래스를 만든다. 클래스 이름은 함수 이름에 기초해 짓는다.
+2. 방금 생성한 빈 클래스로 함수를 옮긴다.
+3. 함수의 인수들 각각은 명령의 필드로 만들어 생성자를 통해 설정할지 고민해본다.
 
 ### Before
 ```js
+function score(candidate, medicalExam, scoringGuide) {
+    let result = 0;
+    let healthLevel = 0;
 ```
 
 ### After
 ```js
+class Scorer {
+    constructor(candidate, medicalExam, scoringGuide) {
+        this._candidate = candidate;
+        this._medicalExam = medicalExam;
+        this._scoringGuide = scoringGuide;
+    }
+    
+    execute() {
+        this._result = 0;
+        this._healthLevel = 0;
 ```
 
-## 11.
+## 11.10 명령을 함수로 바꾸기
 
 ### 절차
-1.
+1. 명령을 생성하는 코드와 명령의 실행 메서드를 호출하는 코드를 함께 함수로 추출한다.
+2. 명령의 실행 함수가 호출하는 보조 메서드들 각각을 인라인한다.
+3. 함수 선언 바꾸기를 적용하여 생성자의 매개변수 모두를 명령의 실행 메서드로 옮긴다.
+4. 명령의 실행 메서드에서 참조하는 필드들 대신 대응하는 매개변수를 사용하게끔 바꾼다. 하나씩 수정할 때마다 테스트한다.
+5. 생성자 호출과 명령의 실행 메서드 호출을 호출자(대체 함수) 안으로 인라인한다.
+6. 테스트한다.
+7. 죽은 코드 제거하기로 명령 클래스를 없앤다.
 
 ### Before
 ```js
+class ChargeCalculator {
+    constructor(customer, usage) {
+        this._customer = customer;
+        this._usage = usage;
+    }
+    execute() {
+        return this._customer.rate * this._usage;
+    }
+}
 ```
 
 ### After
 ```js
+function charge(customer, usage) {
+    return customer.rate * usage;
+}
 ```
 
-## 11.
+## 11.11 수정된 값 반환하기
+
+이 리팩터링은 값 하나를 계산하는 함수들에 가장 효과적이고, 값 여러 개를 갱신하는 함수에는 효과적이지 않다.
 
 ### 절차
-1.
+1. 함수가 수정된 값을 반환하게 하여 호출자가 그 값을 자신의 변수에 저장하게 한다.
+2. 테스트한다.
+3. 피호출 함수 안에 반환할 값을 가리키는 새로운 변수를 선언한다.
+4. 테스트한다.
+5. 계산이 선언과 동시에 이뤄지도록 통합한다. 즉, 선언 시점에 계산 로직을 바로 실행해 대입한다.
+6. 테스트한다.
+7. 피호출 함수의 변수 이름을 새 역할에 어울리도록 바꿔준다.
+8. 테스트한다.
 
 ### Before
 ```js
+let totalAscent = 0;
+calculateAscent();
 ```
 
 ### After
 ```js
+const totalAscent = calculateAscent();
 ```
 
-## 11.
+## 11.12 오류 코드를 예외로 바꾸기
 
 ### 절차
-1.
+1. 콜스택 상위에 해당 예외를 처리할 예외 핸들러를 작성한다.
+2. 테스트한다.
+3. 해당 오류 코드를 대체할 예외와 그 밖은 예외를 구분할 식별 방법을 찾는다.
+4. 정적 검사를 수행한다.
+5. catch절을 수정하여 직접 처리할 수 있는 예외는 적절히 대처하고 그렇지 않은 예외는 다시 던진다.
+6. 테스트한다.
+7. 오류 코드를 반환하는 곳 모두에서 예외를 던지도록 수정한다. 하나씩 수정할 때마다 테스트한다.
+8. 모두 수정했다면 그 오류 코드를 콜스택 위로 전달하는 코드를 모두 제거한다. 하나씩 수정할 때마다 테스트한다.
 
 ### Before
 ```js
+if (data)
+    return new ShippingRules(data);
+else
+    return -23;
 ```
 
 ### After
 ```js
+if (data)
+    return new ShippingRules(data);
+else
+    throw new OrderProcessingError(-23);
 ```
 
-## 11.
+## 11.13 예외를 사전확인으로 바꾸기
 
 ### 절차
-1.
+1. 예외를 유발하는 상황을 검사할 수 있는 조건문을 추가한다. catch 블록의 코드를 조건문의 조건절 중 하나로 옮기고, 남은 try 블록의 코드를 다른 조건절로 옮긴다. 
+2. catch 블록에 어서션을 추가하고 테스트한다.
+3. try문과 catch 블록을 제거한다.
+4. 테스트한다.
 
 ### Before
 ```js
+try {
+    return values[periodNumber];
+} catch (ArrayIndexOutOfBoundsException e) {
+    return 0;
+}
 ```
 
 ### After
 ```js
+return (periodNumber >= values.length) ? 0 : values[periodNumber];
 ```
