@@ -22,6 +22,6 @@
 - [X] CHAPTER 09 데이터 조직화
 - [X] CHAPTER 10 조건부 로직 간소화
 - [X] CHAPTER 11 API 리팩터링
-- [ ] CHAPTER 12 상속 다루기
+- [X] CHAPTER 12 상속 다루기
 - [ ] 부록 A 리팩터링 목록
 - [ ] 부록 B 악취 제거 기법
