@@ -238,30 +238,57 @@ class Salesperson extends Employee {...}
 class Employee {...}
 ```
 
-## 12.
+## 12.10 서브클래스의 위임으로 바꾸기
 
 ### 절차
 
 ### Before
 ```js
+class Order {
+    get daysToShip() {
+        return this._warehouse.daysToShip;
+    }
+}
 
+class PriorityOrder extends Order {
+    get daysToShip() {
+        return this._priorityPlan.daysToShip;
+    }
+}
 ```
 
 ### After
 ```js
+class Order {
+    get daysToShip() {
+        return (this._priorityDelegate) ? this._priorityDelegate.daysToShip : this._warehouse.daysToShip;
+    }
+}
 
+class PriorityOrderDelegate {
+    get daysToShip() {
+        return this._priorityPlan.daysToShip;
+    }
+}
 ```
 
-## 12.
+## 12.11 슈퍼클래스를 위임으로 바꾸기
 
 ### 절차
 
 ### Before
 ```js
-
+class List {...}
+class Stack extends List {...}
 ```
 
 ### After
 ```js
+class Stack {
+    constructor() {
+        this._storage = new List();
+    }
+}
 
+class List {...}
 ```
